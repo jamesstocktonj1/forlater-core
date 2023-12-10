@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jamesstocktonj1/forlater-core/internal/database"
+	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,12 +25,13 @@ func NewServer(config ServerConfig) Server {
 	}
 
 	s.gin = gin.Default()
+
+	rateLimiter := ratelimit.NewRateLimit(config.Ratelimiter, config.Redis)
+	s.gin.Use(rateLimiter.Middleware())
 	s.gin.GET("/ping", s.Ping)
 
 	s.ctx = context.Background()
-	s.cache = redis.NewClient(&redis.Options{
-		Addr: config.RedisAddr,
-	})
+	s.cache = database.NewCache(config.Redis)
 
 	return s
 }

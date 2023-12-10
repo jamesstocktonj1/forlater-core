@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+
+	"github.com/jamesstocktonj1/forlater-core/internal/database"
+	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
 )
 
 type ServerConfig struct {
-	HttpsAddr string `json:"https_addr"`
-	RedisAddr string `json:"redis_addr"`
+	HttpsAddr   string                    `json:"https_addr"`
+	Redis       database.CacheConfig      `json:"redis"`
+	Ratelimiter ratelimit.RateLimitConfig `json:"rate_limit"`
 }
 
 func LoadConfig(filename string) (ServerConfig, error) {
