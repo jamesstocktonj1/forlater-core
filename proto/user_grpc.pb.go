@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: proto/user.proto
 
-package proto
+package forlater_core
 
 import (
 	context "context"

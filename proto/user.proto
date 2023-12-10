@@ -4,6 +4,13 @@ option go_package = "github.com/jamesstocktonj1/forlater-core";
 
 package proto;
 
+enum StatusCode {
+    STATUS_OK = 0;
+    STATUS_ERROR = 1;
+    STATUS_INTERNAL_ERROR = 2;
+    STATUS_FORBIDDEN = 3;
+}
+
 message UserRequest {
     string username = 1;
     string firstname = 2;
@@ -12,7 +19,7 @@ message UserRequest {
 }
 
 message UserResponse {
-    int32 status_code = 1;
+    StatusCode status_code = 1;
     string error_message = 2;
     string username = 3;
     string firstname = 4;
@@ -24,7 +31,7 @@ message TokenRequest {
 }
 
 message TokenResponse {
-    int32 status_code = 1;
+    StatusCode status_code = 1;
     string error_message = 2;
     string token = 3;
 }
