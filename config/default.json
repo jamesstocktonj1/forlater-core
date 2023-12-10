@@ -1,4 +1,10 @@
 {
     "https_addr": ":8000",
-    "redis_addr": ""
+    "redis": {
+        "redis_addr": ""
+    },
+    "rate_limit": {
+        "count": 20,
+        "timeout": 30
+    }
 }
