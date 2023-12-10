@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/jamesstocktonj1/forlater-core";
+
+package proto;
+
+message UserRequest {
+    string username = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string password_hash = 4;
+}
+
+message UserResponse {
+    int32 status_code = 1;
+    string error_message = 2;
+    string username = 3;
+    string firstname = 4;
+    string lastname = 5;
+}
+
+message TokenRequest {
+    string token = 1;
+}
+
+message TokenResponse {
+    int32 status_code = 1;
+    string error_message = 2;
+    string token = 3;
+}
+
+service UserService {
+    rpc CreateUser(UserRequest) returns (UserResponse) {};
+    rpc SetUser(UserRequest) returns (UserResponse) {};
+    rpc GetUser(UserRequest) returns (UserResponse) {};
+    rpc LoginUser(UserRequest) returns (TokenResponse) {};
+
+    rpc ValidateToken(TokenRequest) returns (TokenResponse) {};
+}
