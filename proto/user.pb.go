@@ -4,7 +4,7 @@
 // 	protoc        v3.12.4
 // source: proto/user.proto
 
-package forlater_core
+package proto
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
