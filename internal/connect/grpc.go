@@ -1,6 +1,9 @@
 package connect
 
-import "google.golang.org/grpc"
+import (
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
 
 type ClientConfig struct {
 	Addr    string `json:"addr"`
@@ -8,5 +11,5 @@ type ClientConfig struct {
 }
 
 func NewClientConnection(config ClientConfig) (*grpc.ClientConn, error) {
-	return grpc.Dial(config.Addr)
+	return grpc.Dial(config.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
