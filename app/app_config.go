@@ -15,6 +15,7 @@ type ServerConfig struct {
 	Redis       database.CacheConfig      `json:"redis"`
 	Ratelimiter ratelimit.RateLimitConfig `json:"rate_limit"`
 	UserService connect.ClientConfig      `json:"user_service"`
+	CardService connect.ClientConfig      `json:"card_service"`
 }
 
 func LoadConfig(filename string) (ServerConfig, error) {

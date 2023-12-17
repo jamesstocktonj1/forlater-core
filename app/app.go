@@ -42,6 +42,14 @@ func NewServer(config ServerConfig) Server {
 	s.secure.PUT("/user", userService.HandleSetUser)
 	s.secure.GET("/user", userService.HandleGetUser)
 
+	cardService, err := NewCardHandler(config.CardService)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.secure.POST("/card", cardService.HandleCreateCard)
+	s.secure.PUT("/card", cardService.HandleSetCard)
+	s.secure.GET("/card", cardService.HandleGetCard)
+
 	s.ctx = context.Background()
 	s.cache = database.NewCache(config.Redis)
 
