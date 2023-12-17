@@ -21,7 +21,8 @@ message Card {
 }
 
 message CardRequest {
-    repeated string card_id = 1;
+    string username = 1;
+    repeated string card_id = 2;
 }
 
 message CardResponse {
