@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jamesstocktonj1/forlater-core/internal/database"
+	"github.com/jamesstocktonj1/forlater-core/middleware/authentication"
 	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
 	"github.com/redis/go-redis/v9"
 )
@@ -31,7 +32,12 @@ func NewServer(config ServerConfig) Server {
 	s.gin.Use(rateLimiter.Middleware())
 	s.gin.GET("/ping", s.Ping)
 
+	authentication, err := authentication.NewAuthentication(config.Authentication, config.UserService)
+	if err != nil {
+		log.Fatal(err)
+	}
 	s.secure = s.gin.Group("/")
+	s.secure.Use(authentication.Middleware())
 
 	userService, err := NewUserHandler(config.UserService)
 	if err != nil {
