@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/jamesstocktonj1/forlater-core/internal/connect"
 	"github.com/jamesstocktonj1/forlater-core/internal/database"
 	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
 )
@@ -13,6 +14,7 @@ type ServerConfig struct {
 	HttpsAddr   string                    `json:"https_addr"`
 	Redis       database.CacheConfig      `json:"redis"`
 	Ratelimiter ratelimit.RateLimitConfig `json:"rate_limit"`
+	UserService connect.ClientConfig      `json:"user_service"`
 }
 
 func LoadConfig(filename string) (ServerConfig, error) {
