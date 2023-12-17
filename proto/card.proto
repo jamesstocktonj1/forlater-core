@@ -21,14 +21,14 @@ message Card {
 }
 
 message CardRequest {
-    string card_id = 1;
+    repeated string card_id = 1;
 }
 
 message CardResponse {
     CardStatusCode status_code = 1;
     string status_message = 2;
     string card_id = 3;
-    Card card = 4;
+    repeated Card card = 4;
 }
 
 service CardService {
