@@ -17,6 +17,7 @@ type Server struct {
 	ctx    context.Context
 	cache  *redis.Client
 	config ServerConfig
+	secure *gin.RouterGroup
 }
 
 func NewServer(config ServerConfig) Server {
@@ -29,6 +30,25 @@ func NewServer(config ServerConfig) Server {
 	rateLimiter := ratelimit.NewRateLimit(config.Ratelimiter, config.Redis)
 	s.gin.Use(rateLimiter.Middleware())
 	s.gin.GET("/ping", s.Ping)
+
+	s.secure = s.gin.Group("/")
+
+	userService, err := NewUserHandler(config.UserService)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.gin.POST("/user", userService.HandleCreateUser)
+	s.gin.POST("/login", userService.HandleLoginUser)
+	s.secure.PUT("/user", userService.HandleSetUser)
+	s.secure.GET("/user", userService.HandleGetUser)
+
+	cardService, err := NewCardHandler(config.CardService)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.secure.POST("/card", cardService.HandleCreateCard)
+	s.secure.PUT("/card", cardService.HandleSetCard)
+	s.secure.GET("/card", cardService.HandleGetCard)
 
 	s.ctx = context.Background()
 	s.cache = database.NewCache(config.Redis)
