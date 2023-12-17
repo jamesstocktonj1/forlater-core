@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/jamesstocktonj1/forlater-core";
+
+package proto;
+
+enum CardStatusCode {
+    OK = 0;
+    ERROR = 1;
+    INTERNAL_ERROR = 2;
+    FORBIDDEN = 3;
+    BAD_HASH = 4;
+}
+
+message Card {
+    string  card_id = 1;
+    string username = 2;
+    string content = 3;
+    int64 timestamp = 4;
+    string hash = 5;
+}
+
+message CardRequest {
+    string card_id = 1;
+}
+
+message CardResponse {
+    CardStatusCode status_code = 1;
+    string status_message = 2;
+    string card_id = 3;
+    Card card = 4;
+}
+
+service CardService {
+    rpc CreateCard(Card) returns (CardResponse) {};
+    rpc SetCard(Card) returns (CardResponse) {};
+    rpc GetCard(CardRequest) returns (CardResponse) {};
+    rpc DeleteCard(CardRequest) returns (CardResponse) {};
+}
