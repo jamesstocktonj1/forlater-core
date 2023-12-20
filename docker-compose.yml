@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GIN_MODE=release
+      - APP_CONFIG=/app/config.json
+    volumes:
+      - ./config/compose-config.json:/app/config.json
+    ports:
+      - 8000:8000
+    depends_on:
+      - proxy-cache
+
+  proxy-cache:
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
