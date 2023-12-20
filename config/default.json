@@ -1,10 +1,21 @@
 {
     "https_addr": ":8000",
     "redis": {
-        "redis_addr": ""
+        "redis_addr": "redis"
     },
     "rate_limit": {
         "count": 20,
         "timeout": 30
+    },
+    "authentication": {
+        "redis_addr": "redis"
+    },
+    "user_service": {
+        "addr": "user:9090",
+        "timeout": 1000
+    },
+    "card_service": {
+        "addr": "card:9090",
+        "timeout": 1000
     }
 }
