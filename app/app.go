@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jamesstocktonj1/forlater-core/internal/config"
 	"github.com/jamesstocktonj1/forlater-core/internal/database"
 	"github.com/jamesstocktonj1/forlater-core/middleware/authentication"
 	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
@@ -17,29 +18,47 @@ type Server struct {
 	gin    *gin.Engine
 	ctx    context.Context
 	cache  *redis.Client
-	config ServerConfig
+	config *config.ServerConfig
+	consul *ConsulClient
 	secure *gin.RouterGroup
 }
 
-func NewServer(config ServerConfig) Server {
-	s := Server{
-		config: config,
+func NewServer() Server {
+	var err error
+	s := Server{}
+
+	// Consul Config Init
+	s.consul, err = NewConsulClient()
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	err = s.consul.Register()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer s.consul.Deregister()
+
+	s.config, err = s.consul.LoadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Gin API Init
 	s.gin = gin.Default()
 
-	rateLimiter := ratelimit.NewRateLimit(config.Ratelimiter, config.Redis)
+	rateLimiter := ratelimit.NewRateLimit(s.config)
 	s.gin.Use(rateLimiter.Middleware())
 	s.gin.GET("/ping", s.Ping)
 
-	authentication, err := authentication.NewAuthentication(config.Authentication, config.UserService)
+	authentication, err := authentication.NewAuthentication(s.config.Authentication, s.config.UserService)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.secure = s.gin.Group("/")
 	s.secure.Use(authentication.Middleware())
 
-	userService, err := NewUserHandler(config.UserService)
+	userService, err := NewUserHandler(s.config.UserService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +67,7 @@ func NewServer(config ServerConfig) Server {
 	s.secure.PUT("/user", userService.HandleSetUser)
 	s.secure.GET("/user", userService.HandleGetUser)
 
-	cardService, err := NewCardHandler(config.CardService)
+	cardService, err := NewCardHandler(s.config.CardService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +76,7 @@ func NewServer(config ServerConfig) Server {
 	s.secure.GET("/card", cardService.HandleGetCard)
 
 	s.ctx = context.Background()
-	s.cache = database.NewCache(config.Redis)
+	s.cache = database.NewCache(s.config.Cache)
 
 	return s
 }
