@@ -1,4 +1,4 @@
-package app
+package config
 
 import (
 	"encoding/json"
@@ -8,13 +8,17 @@ import (
 	"github.com/jamesstocktonj1/forlater-core/internal/connect"
 	"github.com/jamesstocktonj1/forlater-core/internal/database"
 	"github.com/jamesstocktonj1/forlater-core/middleware/authentication"
-	"github.com/jamesstocktonj1/forlater-core/middleware/ratelimit"
 )
+
+type RateLimitConfig struct {
+	Timeout int   `json:"timeout"`
+	Count   int64 `json:"count"`
+}
 
 type ServerConfig struct {
 	HttpsAddr      string                              `json:"https_addr"`
-	Redis          database.CacheConfig                `json:"redis"`
-	Ratelimiter    ratelimit.RateLimitConfig           `json:"rate_limit"`
+	Cache          database.CacheConfig                `json:"redis"`
+	Ratelimiter    RateLimitConfig                     `json:"rate_limit"`
 	Authentication authentication.AuthenticationConfig `json:"authentication"`
 	UserService    connect.ClientConfig                `json:"user_service"`
 	CardService    connect.ClientConfig                `json:"card_service"`
