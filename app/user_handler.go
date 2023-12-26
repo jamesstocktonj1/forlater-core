@@ -14,6 +14,7 @@ type UserHandler struct {
 	conn   proto.UserServiceClient
 	ctx    context.Context
 	cancel context.CancelFunc
+	config connect.ClientConfig
 }
 
 func NewUserHandler(config connect.ClientConfig) (*UserHandler, error) {
@@ -27,6 +28,7 @@ func NewUserHandler(config connect.ClientConfig) (*UserHandler, error) {
 	}
 
 	u.conn = proto.NewUserServiceClient(conn)
+	u.config = config
 
 	return &u, nil
 }
@@ -34,12 +36,13 @@ func NewUserHandler(config connect.ClientConfig) (*UserHandler, error) {
 func (u *UserHandler) HandleCreateUser(c *gin.Context) {
 	user := UserData{}
 
-	err := c.BindJSON(user)
+	err := c.BindJSON(&user)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "unable to parse input json"})
 		return
 	}
 
+	u.ctx, u.cancel = context.WithTimeout(u.ctx, time.Millisecond*time.Duration(u.config.Timeout))
 	resp, err := u.conn.CreateUser(u.ctx, user.toProto())
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal connection error"})
@@ -64,12 +67,13 @@ func (u *UserHandler) HandleCreateUser(c *gin.Context) {
 func (u *UserHandler) HandleSetUser(c *gin.Context) {
 	user := UserData{}
 
-	err := c.BindJSON(user)
+	err := c.BindJSON(&user)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "unable to parse input json"})
 		return
 	}
 
+	u.ctx, u.cancel = context.WithTimeout(u.ctx, time.Millisecond*time.Duration(u.config.Timeout))
 	resp, err := u.conn.SetUser(u.ctx, user.toProto())
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal connection error"})
@@ -102,6 +106,7 @@ func (u *UserHandler) HandleGetUser(c *gin.Context) {
 		return
 	}
 
+	u.ctx, u.cancel = context.WithTimeout(u.ctx, time.Millisecond*time.Duration(u.config.Timeout))
 	resp, err := u.conn.GetUser(u.ctx, user.toProto())
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal connection error"})
@@ -126,12 +131,13 @@ func (u *UserHandler) HandleGetUser(c *gin.Context) {
 func (u *UserHandler) HandleLoginUser(c *gin.Context) {
 	user := UserData{}
 
-	err := c.BindJSON(user)
+	err := c.BindJSON(&user)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "unable to parse input json"})
 		return
 	}
 
+	u.ctx, u.cancel = context.WithTimeout(u.ctx, time.Millisecond*time.Duration(u.config.Timeout))
 	resp, err := u.conn.LoginUser(u.ctx, user.toProto())
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "internal connection error"})
